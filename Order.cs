@@ -6,5 +6,5 @@ public class Order
     public DateTime OrderDate { get; set; }
     
     public Product Product { get; set; }
-    public Customer Customer { get; set; }
+    public Customer Customer { get; set; }    
 }

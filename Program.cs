@@ -23,6 +23,8 @@ public class Program
         RestoreCustomer("Arthur");
 
         QueryCustomerAndOrderSnapshots();
+
+        QueryEverythingTemporalAsOf();
     }
 
     private static void LookupCurrentPrice(string productName)
@@ -169,13 +171,51 @@ public class Program
         Console.WriteLine();
     }
 
+    private static void QueryEverythingTemporalAsOf()
+    {
+        using var context = new OrdersContext(log: true);
+
+        var query = context.Products.TemporalAsOf(DateTime.UtcNow)
+            .Include(p => p.Orders).ThenInclude(o => o.Customer)
+            .Include(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
+
+        var list = query.ToList();
+    }
+
     private static List<DateTime> Seed(TimeSpan sleep)
     {
         using var context = new OrdersContext();
 
         context.Database.EnsureDeleted();
         context.Database.Migrate();
-        
+
+        var productClasses = new List<ProductClass>()
+        {
+            new ProductClass() { Id = 111, Name = "Product Class 1" },
+            new ProductClass() { Id = 112, Name = "Product Class 2" },
+            new ProductClass() { Id = 113, Name = "Product Class 3" }
+        };
+
+        context.ProductClasses.AddRange(productClasses);
+
+
+        var productTypes = new List<ProductType>() 
+        {
+            new ProductType() { Id = 11, Name = "Product Type 11", ProductClass = productClasses[0] },
+            new ProductType() { Id = 12, Name = "Product Type 12", ProductClass = productClasses[1] },
+            new ProductType() { Id = 13, Name = "Product Type 13", ProductClass = productClasses[2] },
+
+            new ProductType() { Id = 21, Name = "Product Type 21", ProductClass = productClasses[0] },
+            new ProductType() { Id = 22, Name = "Product Type 22", ProductClass = productClasses[1] },
+            new ProductType() { Id = 23, Name = "Product Type 23", ProductClass = productClasses[2] },
+
+            new ProductType() { Id = 31, Name = "Product Type 31", ProductClass = productClasses[0] },
+            new ProductType() { Id = 32, Name = "Product Type 32", ProductClass = productClasses[1] },
+            new ProductType() { Id = 33, Name = "Product Type 33", ProductClass = productClasses[2] }
+        };
+
+        context.ProductTypes.AddRange(productTypes);
+
         var timestamps = new List<DateTime>();
 
         var customer = new Customer { Name = "Arthur" };
@@ -183,9 +223,9 @@ public class Program
 
         var products = new List<Product>
         {
-            new() { Name = "DeLorean", Price = 1_000_000.00m },
-            new() { Name = "Flux Capacitor", Price = 666.00m },
-            new() { Name = "Hoverboard", Price = 59_000.00m }
+            new() { Name = "DeLorean", Price = 1_000_000.00m, ProductType = productTypes[0] },
+            new() { Name = "Flux Capacitor", Price = 666.00m, ProductType = productTypes[1] },
+            new() { Name = "Hoverboard", Price = 59_000.00m, ProductType = productTypes[2] }
         };
 
         context.AddRange(products);

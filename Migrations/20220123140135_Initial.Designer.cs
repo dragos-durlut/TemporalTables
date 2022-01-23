@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrations
 {
     [DbContext(typeof(OrdersContext))]
-    [Migration("20211006171636_MakeTemporal")]
-    partial class MakeTemporal
+    [Migration("20220123140135_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0-rtm.21503.1")
+                .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -126,7 +126,14 @@ namespace Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ProductTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(12);
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductTypeId");
 
                     b.ToTable("Products", (string)null);
 
@@ -142,6 +149,39 @@ namespace Migrations
                     ));
                 });
 
+            modelBuilder.Entity("ProductClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductClasses", (string)null);
+                });
+
+            modelBuilder.Entity("ProductType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("ProductClassId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(112);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductClassId");
+
+                    b.ToTable("ProductTypes", (string)null);
+                });
+
             modelBuilder.Entity("Order", b =>
                 {
                     b.HasOne("Customer", "Customer")
@@ -149,7 +189,7 @@ namespace Migrations
                         .HasForeignKey("CustomerId");
 
                     b.HasOne("Product", "Product")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("ProductId");
 
                     b.Navigation("Customer");
@@ -157,9 +197,46 @@ namespace Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.HasOne("ProductType", "ProductType")
+                        .WithMany("Products")
+                        .HasForeignKey("ProductTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductType");
+                });
+
+            modelBuilder.Entity("ProductType", b =>
+                {
+                    b.HasOne("ProductClass", "ProductClass")
+                        .WithMany("ProductTypes")
+                        .HasForeignKey("ProductClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductClass");
+                });
+
             modelBuilder.Entity("Customer", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("ProductClass", b =>
+                {
+                    b.Navigation("ProductTypes");
+                });
+
+            modelBuilder.Entity("ProductType", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
