@@ -24,7 +24,11 @@ public class Program
 
         QueryCustomerAndOrderSnapshots();
 
-        QueryEverythingTemporalAsOf();
+        QueryEverythingTemporalAsOf_StartingFromProduct();
+
+        QueryEverythingTemporalAsOf_StartingFromOrder();
+
+        QueryEverythingTemporalAsOf_StartingFromCustomer();
     }
 
     private static void LookupCurrentPrice(string productName)
@@ -171,7 +175,7 @@ public class Program
         Console.WriteLine();
     }
 
-    private static void QueryEverythingTemporalAsOf()
+    private static void QueryEverythingTemporalAsOf_StartingFromProduct()
     {
         using var context = new OrdersContext(log: true);
 
@@ -179,6 +183,26 @@ public class Program
             .Include(p => p.Orders).ThenInclude(o => o.Customer)
             .Include(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
 
+        var list = query.ToList();
+    }
+
+    private static void QueryEverythingTemporalAsOf_StartingFromOrder()
+    {
+        using var context = new OrdersContext(log: true);
+
+        var query = context.Orders.TemporalAsOf(DateTime.UtcNow)
+            .Include(o => o.Customer)
+            .Include(o=>o.Product).ThenInclude(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
+
+        var list = query.ToList();
+    }
+
+    private static void QueryEverythingTemporalAsOf_StartingFromCustomer()
+    {
+        using var context = new OrdersContext(log: true);
+
+        var query = context.Customers.TemporalAsOf(DateTime.UtcNow)
+            .Include(c => c.Orders).ThenInclude(o => o.Product).ThenInclude(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
         var list = query.ToList();
     }
 
