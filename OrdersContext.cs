@@ -31,6 +31,8 @@ public class OrdersContext : DbContext
                 .EnableSensitiveDataLogging()
                 .LogTo(Console.WriteLine, new[] { RelationalEventId.CommandExecuted });
         }
+
+        optionsBuilder.ReplaceService<Microsoft.EntityFrameworkCore.Query.INavigationExpansionExtensibilityHelper, Microsoft.EntityFrameworkCore.SqlServer.Query.CustomSqlServerNavigationExpansionExtensibilityHelper>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
