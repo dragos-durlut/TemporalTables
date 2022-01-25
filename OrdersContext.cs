@@ -1,6 +1,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Query;
 
 public class OrdersContext : DbContext
 {
@@ -31,6 +33,16 @@ public class OrdersContext : DbContext
                 .EnableSensitiveDataLogging()
                 .LogTo(Console.WriteLine, new[] { RelationalEventId.CommandExecuted });
         }
+
+        optionsBuilder.ReplaceService<IEntityMaterializerSource, TemporalEntityMaterializerSource>();
+    }
+
+    private void SetupTemporalTableBuilder<TEntity>(TemporalTableBuilder<TEntity> temporalTableBuilder) where TEntity: class , ITemporalEntity
+    {
+        var periodStartTemporalPeriodPropertyBuilder = temporalTableBuilder.HasPeriodStart(TemporalEntityConstants.FromSysDateShadow);
+        periodStartTemporalPeriodPropertyBuilder.HasColumnName(TemporalEntityConstants.FromSysDate);
+        var periodEndTemporalPeriodPropertyBuilder = temporalTableBuilder.HasPeriodEnd(TemporalEntityConstants.ToSysDateShadow);
+        periodEndTemporalPeriodPropertyBuilder.HasColumnName(TemporalEntityConstants.ToSysDate);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,15 +63,15 @@ public class OrdersContext : DbContext
 
         modelBuilder
             .Entity<Customer>()
-            .ToTable("Customers", b => b.IsTemporal());
+            .ToTable("Customers", b => b.IsTemporal(SetupTemporalTableBuilder));
         
         modelBuilder
             .Entity<Product>()
-            .ToTable("Products", b => b.IsTemporal());
+            .ToTable("Products", b => b.IsTemporal(SetupTemporalTableBuilder));
 
         modelBuilder
             .Entity<Order>()
-            .ToTable("Orders", b => b.IsTemporal());
+            .ToTable("Orders", b => b.IsTemporal(SetupTemporalTableBuilder));
 
         modelBuilder.Entity<ProductType>()
             .Property<int>("ProductClassId").HasDefaultValue(112);

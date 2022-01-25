@@ -24,7 +24,7 @@ public class Program
 
         QueryCustomerAndOrderSnapshots();
 
-        QueryEverythingTemporalAsOf();
+        QueryTemporalTablesAndNonTemporalTables();
     }
 
     private static void LookupCurrentPrice(string productName)
@@ -46,21 +46,14 @@ public class Program
 
         var productSnapshots = context.Products
             .TemporalFromTo(from, to)
-            .OrderBy(product => EF.Property<DateTime>(product, "PeriodStart"))
-            .Where(product => product.Name == productName)
-            .Select(product =>
-                new
-                {
-                    Product = product,
-                    PeriodStart = EF.Property<DateTime>(product, "PeriodStart"),
-                    PeriodEnd = EF.Property<DateTime>(product, "PeriodEnd")
-                })
+            .OrderBy(product => EF.Property<DateTime>(product, TemporalEntityConstants.FromSysDateShadow))
+            .Where(product => product.Name == productName)            
             .ToList();
 
-        foreach (var snapshot in productSnapshots)
+        foreach (var productSnapshot in productSnapshots)
         {
             Console.WriteLine(
-                $"  The '{snapshot.Product.Name}' with PK {snapshot.Product.Id} was ${snapshot.Product.Price} from {snapshot.PeriodStart} until {snapshot.PeriodEnd}.");
+                $"  The '{productSnapshot.Name}' with PK {productSnapshot.Id} was ${productSnapshot.Price} from {productSnapshot.FromSysDate} until {productSnapshot.ToSysDate}.");
         }
 
         Console.WriteLine();
@@ -107,8 +100,8 @@ public class Program
         var customerDeletedOn = context.Customers
             .TemporalAll()
             .Where(customer => customer.Name == customerName)
-            .OrderBy(customer => EF.Property<DateTime>(customer, "PeriodEnd"))
-            .Select(customer => EF.Property<DateTime>(customer, "PeriodEnd"))
+            .OrderBy(customer => EF.Property<DateTime>(customer, TemporalEntityConstants.ToSysDateShadow))
+            .Select(customer => EF.Property<DateTime>(customer, TemporalEntityConstants.ToSysDateShadow))
             .Last();
         
         Console.WriteLine();
@@ -132,50 +125,36 @@ public class Program
 
         var customerSnapshots = context.Customers
             .TemporalAll()
-            .OrderBy(customer => EF.Property<DateTime>(customer, "PeriodStart"))
-            .Select(customer =>
-                new
-                {
-                    Customer = customer,
-                    PeriodStart = EF.Property<DateTime>(customer, "PeriodStart"),
-                    PeriodEnd = EF.Property<DateTime>(customer, "PeriodEnd")
-                })
+            .OrderBy(customer => EF.Property<DateTime>(customer, TemporalEntityConstants.FromSysDateShadow))
             .ToList();
 
-        foreach (var snapshot in customerSnapshots)
+        foreach (var customerSnapshot in customerSnapshots)
         {
             Console.WriteLine(
-                $"The customer '{snapshot.Customer.Name}' existed from {snapshot.PeriodStart} until {snapshot.PeriodEnd}.");
+                $"The customer '{customerSnapshot.Name}' existed from {customerSnapshot.FromSysDate} until {customerSnapshot.ToSysDate}.");
         }
 
         Console.WriteLine();
 
         var orderSnapshots = context.Orders
             .TemporalAll()
-            .OrderBy(order => EF.Property<DateTime>(order, "PeriodStart"))
-            .Select(order =>
-                new
-                {
-                    Order = order,
-                    PeriodStart = EF.Property<DateTime>(order, "PeriodStart"),
-                    PeriodEnd = EF.Property<DateTime>(order, "PeriodEnd")
-                })
+            .OrderBy(order => EF.Property<DateTime>(order, TemporalEntityConstants.FromSysDateShadow))            
             .ToList();
 
-        foreach (var snapshot in orderSnapshots)
+        foreach (var orderSnapshot in orderSnapshots)
         {
             Console.WriteLine(
-                $"The order with ID '{snapshot.Order.Id}' existed from {snapshot.PeriodStart} until {snapshot.PeriodEnd}.");
+                $"The order with ID '{orderSnapshot.Id}' existed from {orderSnapshot.FromSysDate} until {orderSnapshot.ToSysDate}.");
         }
 
         Console.WriteLine();
     }
 
-    private static void QueryEverythingTemporalAsOf()
+    private static void QueryTemporalTablesAndNonTemporalTables()
     {
         using var context = new OrdersContext(log: true);
 
-        var query = context.Products.TemporalAsOf(DateTime.UtcNow)
+        var query = context.Products
             .Include(p => p.Orders).ThenInclude(o => o.Customer)
             .Include(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
 

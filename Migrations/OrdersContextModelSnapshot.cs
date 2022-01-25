@@ -30,15 +30,23 @@ namespace Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
+                    /*b.Property<DateTime>("ToSysDate")
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
+                        .HasColumnName("ToSysDate");*/
 
-                    b.Property<DateTime>("PeriodStart")
+                    b.Property<DateTime>("ToSysDateShadow")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
+                        .HasColumnName("ToSysDate");
+
+                    /*b.Property<DateTime>("FromSysDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate1");*/
+
+                    b.Property<DateTime>("FromSysDateShadow")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate");
 
                     b.HasKey("Id");
 
@@ -47,11 +55,11 @@ namespace Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
                             ttb
-                                .HasPeriodStart("PeriodStart")
-                                .HasColumnName("PeriodStart");
+                                .HasPeriodStart("FromSysDateShadow")
+                                .HasColumnName("FromSysDate");
                             ttb
-                                .HasPeriodEnd("PeriodEnd")
-                                .HasColumnName("PeriodEnd");
+                                .HasPeriodEnd("ToSysDateShadow")
+                                .HasColumnName("ToSysDate");
                         }
                     ));
                 });
@@ -68,15 +76,23 @@ namespace Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
+                    /*b.Property<DateTime>("ToSysDate")
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
+                        .HasColumnName("ToSysDate");*/
 
-                    b.Property<DateTime>("PeriodStart")
+                    b.Property<DateTime>("ToSysDateShadow")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
+                        .HasColumnName("ToSysDate");
+
+                    /*b.Property<DateTime>("FromSysDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate");*/
+
+                    b.Property<DateTime>("FromSysDateShadow")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate");
 
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -92,11 +108,11 @@ namespace Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
                             ttb
-                                .HasPeriodStart("PeriodStart")
-                                .HasColumnName("PeriodStart");
+                                .HasPeriodStart("FromSysDateShadow")
+                                .HasColumnName("FromSysDate");
                             ttb
-                                .HasPeriodEnd("PeriodEnd")
-                                .HasColumnName("PeriodEnd");
+                                .HasPeriodEnd("ToSysDateShadow")
+                                .HasColumnName("ToSysDate");
                         }
                     ));
                 });
@@ -110,15 +126,23 @@ namespace Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
+                    /*b.Property<DateTime>("ToSysDate")
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
+                        .HasColumnName("ToSysDate");*/
 
-                    b.Property<DateTime>("PeriodStart")
+                    b.Property<DateTime>("ToSysDateShadow")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
+                        .HasColumnName("ToSysDate");
+
+                    /*b.Property<DateTime>("FromSysDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate");*/
+
+                    b.Property<DateTime>("FromSysDateShadow")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("FromSysDate");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -138,11 +162,11 @@ namespace Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
                             ttb
-                                .HasPeriodStart("PeriodStart")
-                                .HasColumnName("PeriodStart");
+                                .HasPeriodStart("FromSysDateShadow")
+                                .HasColumnName("FromSysDate");
                             ttb
-                                .HasPeriodEnd("PeriodEnd")
-                                .HasColumnName("PeriodEnd");
+                                .HasPeriodEnd("ToSysDateShadow")
+                                .HasColumnName("ToSysDate");
                         }
                     ));
                 });

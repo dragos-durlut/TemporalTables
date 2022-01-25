@@ -15,14 +15,14 @@ namespace Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ToSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
-                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate"),
+                    FromSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart")
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate")
                 },
                 constraints: table =>
                 {
@@ -31,8 +31,8 @@ namespace Migrations
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "CustomersHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.CreateTable(
                 name: "ProductClasses",
@@ -73,14 +73,14 @@ namespace Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProductTypeId = table.Column<int>(type: "int", nullable: false, defaultValue: 12),
-                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ToSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
-                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate"),
+                    FromSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart")
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate")
                 },
                 constraints: table =>
                 {
@@ -95,8 +95,8 @@ namespace Migrations
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "ProductsHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.CreateTable(
                 name: "Orders",
@@ -106,14 +106,14 @@ namespace Migrations
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ToSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
-                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate"),
+                    FromSysDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
-                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart")
+                        .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                        .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate")
                 },
                 constraints: table =>
                 {
@@ -132,8 +132,8 @@ namespace Migrations
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "OrdersHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerId",
@@ -163,24 +163,24 @@ namespace Migrations
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "OrdersHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.DropTable(
                 name: "Customers")
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "CustomersHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.DropTable(
                 name: "Products")
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "ProductsHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "ToSysDate")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "FromSysDate");
 
             migrationBuilder.DropTable(
                 name: "ProductTypes");
