@@ -75,7 +75,7 @@ public class Program
         using var context = new OrdersContext(log: true);
 
         var order = context.Orders
-            .TemporalAsOf(on)
+            .TemporalAsOf(on, QueryTrackingBehavior.NoTrackingWithIdentityResolution)
             .Include(e => e.Product)
             .Include(e => e.Customer)
             .Single(order =>
@@ -118,7 +118,7 @@ public class Program
         Console.WriteLine();
 
         var customerAndOrders = context.Customers
-            .TemporalAsOf(customerDeletedOn.AddMilliseconds(-1))
+            .TemporalAsOf(customerDeletedOn.AddMilliseconds(-1), QueryTrackingBehavior.NoTrackingWithIdentityResolution)
             .Include(e => e.Orders)
             .Single();
         
@@ -179,7 +179,7 @@ public class Program
     {
         using var context = new OrdersContext(log: true);
 
-        var query = context.Products.TemporalAsOf(DateTime.UtcNow)
+        var query = context.Products.TemporalAsOf(DateTime.UtcNow, QueryTrackingBehavior.NoTrackingWithIdentityResolution)
             .Include(p => p.Orders).ThenInclude(o => o.Customer)
             .Include(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
 
@@ -190,7 +190,7 @@ public class Program
     {
         using var context = new OrdersContext(log: true);
 
-        var query = context.Orders.TemporalAsOf(DateTime.UtcNow)
+        var query = context.Orders.TemporalAsOf(DateTime.UtcNow, QueryTrackingBehavior.NoTrackingWithIdentityResolution)
             .Include(o => o.Customer)
             .Include(o=>o.Product).ThenInclude(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
 
@@ -201,7 +201,7 @@ public class Program
     {
         using var context = new OrdersContext(log: true);
 
-        var query = context.Customers.TemporalAsOf(DateTime.UtcNow)
+        var query = context.Customers.TemporalAsOf(DateTime.UtcNow, QueryTrackingBehavior.NoTrackingWithIdentityResolution)
             .Include(c => c.Orders).ThenInclude(o => o.Product).ThenInclude(p => p.ProductType).ThenInclude(pt => pt.ProductClass);
         var list = query.ToList();
     }
