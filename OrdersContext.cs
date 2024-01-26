@@ -23,7 +23,7 @@ public class OrdersContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(@"Server=.;Database=Orders; Integrated Security=SSPI; Enlist = false");
+        optionsBuilder.UseSqlServer(@"Server=.;Database=Orders; Integrated Security=SSPI; Enlist = false;TrustServerCertificate=True;");
 
         if (_log)
         {
