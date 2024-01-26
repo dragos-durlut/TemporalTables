@@ -3,89 +3,72 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.SqlServer.Internal;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System;
+using System.Linq;
 #nullable enable
 
 namespace Microsoft.EntityFrameworkCore.SqlServer.Query
 {
 #pragma warning disable EF1001 // Internal EF Core API usage.
+    /// <summary>
+    /// Fixes AsOf and FromTo temporal query with join with non-temporal child entities
+    /// See https://github.com/dotnet/efcore/issues/27259
+    /// </summary>
     public class CustomSqlServerNavigationExpansionExtensibilityHelper : SqlServerNavigationExpansionExtensibilityHelper, INavigationExpansionExtensibilityHelper
     {
         public CustomSqlServerNavigationExpansionExtensibilityHelper(NavigationExpansionExtensibilityHelperDependencies dependencies) : base(dependencies)
         {
         }
 
-        public override QueryRootExpression CreateQueryRoot(IEntityType entityType, QueryRootExpression? source)
+        public override EntityQueryRootExpression CreateQueryRoot(IEntityType entityType, EntityQueryRootExpression? source)
         {
-            if (source is TemporalQueryRootExpression)
+            //BEGIN CUSTOM CODE
+            if (source is TemporalQueryRootExpression
+                && !entityType.IsMappedToJson()
+                && !OwnedEntityMappedToSameTableAsOwner(entityType))
             {
                 if (!entityType.GetRootType().IsTemporal())
                 {
-                    if (source is TemporalAsOfQueryRootExpression asOf1)
+                    //Expand the non-temporal type with a default EntityQueryRootExpression
+                    if (source is TemporalAsOfQueryRootExpression || source is TemporalFromToQueryRootExpression)
                     {
-#pragma warning disable CS8604 // Possible null reference argument.
-                        return source.QueryProvider != null ? new QueryRootExpression(source.QueryProvider, entityType) : new QueryRootExpression(entityType);
-#pragma warning restore CS8604 // Possible null reference argument.
+                        return source.QueryProvider != null ? new EntityQueryRootExpression(source.QueryProvider, entityType) : new EntityQueryRootExpression(entityType);
                     }
+                }
+            }
+            //END CUSTOM CODE
+
+            return base.CreateQueryRoot(entityType, source);
+        }
+
+        public override void ValidateQueryRootCreation(IEntityType entityType, EntityQueryRootExpression? source)
+        {
+            if (source is TemporalQueryRootExpression
+                && !entityType.IsMappedToJson()
+                && !OwnedEntityMappedToSameTableAsOwner(entityType))
+            {
+                if (!entityType.GetRootType().IsTemporal())
+                {
+                    //BEGIN CUSTOM CODE
+                    //Allow temporal queries 'AsOf' and 'FromTo' to navigate to non temporal types 
+                    if (source is TemporalAsOfQueryRootExpression || source is TemporalFromToQueryRootExpression)
+                        return;
+                    //END CUSTOM CODE
+
                     throw new InvalidOperationException(
                         SqlServerStrings.TemporalNavigationExpansionBetweenTemporalAndNonTemporal(entityType.DisplayName()));
                 }
 
-                if (source is TemporalAsOfQueryRootExpression asOf)
-                {
-                    return source.QueryProvider != null
-                        ? new TemporalAsOfQueryRootExpression(source.QueryProvider, entityType, asOf.PointInTime)
-                        : new TemporalAsOfQueryRootExpression(entityType, asOf.PointInTime);
-                }
-
-                throw new InvalidOperationException(SqlServerStrings.TemporalNavigationExpansionOnlySupportedForAsOf("AsOf"));
+                if (source is not TemporalAsOfQueryRootExpression)
+                    throw new InvalidOperationException(SqlServerStrings.TemporalNavigationExpansionOnlySupportedForAsOf("AsOf"));
             }
 
-            return base.CreateQueryRoot(entityType, source);
+            base.ValidateQueryRootCreation(entityType, source);
         }
-                
-        public override bool AreQueryRootsCompatible(QueryRootExpression? first, QueryRootExpression? second)
-        {
-            if (!base.AreQueryRootsCompatible(first, second))
-            {
-                return false;
-            }
-
-            var firstTemporal = first is TemporalQueryRootExpression;
-            var secondTemporal = second is TemporalQueryRootExpression;
-
-            if (firstTemporal && secondTemporal)
-            {
-                if (first is TemporalAsOfQueryRootExpression firstAsOf
-                    && second is TemporalAsOfQueryRootExpression secondAsOf
-                    && firstAsOf.PointInTime == secondAsOf.PointInTime)
-                {
-                    return true;
-                }
-
-                if (first is TemporalAllQueryRootExpression
-                    && second is TemporalAllQueryRootExpression)
-                {
-                    return true;
-                }
-
-                if (first is TemporalRangeQueryRootExpression firstRange
-                    && second is TemporalRangeQueryRootExpression secondRange
-                    && firstRange.From == secondRange.From
-                    && firstRange.To == secondRange.To)
-                {
-                    return true;
-                }
-            }
-
-            if (firstTemporal || secondTemporal)
-            {
-                var entityType = first?.EntityType ?? second?.EntityType;
-
-                throw new InvalidOperationException(SqlServerStrings.TemporalSetOperationOnMismatchedSources(entityType!.DisplayName()));
-            }
-
-            return true;
-        }
+        private bool OwnedEntityMappedToSameTableAsOwner(IEntityType entityType)
+            => entityType.IsOwned()
+                && entityType.FindOwnership()!.PrincipalEntityType.GetTableMappings().FirstOrDefault()?.Table is ITable ownerTable
+                    && entityType.GetTableMappings().FirstOrDefault()?.Table is ITable entityTable
+                    && ownerTable == entityTable;
     }
 #pragma warning restore EF1001 // Internal EF Core API usage.
 }
