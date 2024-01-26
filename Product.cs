@@ -15,8 +15,7 @@ public class Product : ITemporalEntity
 
     public virtual List<Order> Orders { get; set; }
 
-    [NotMapped]
     public DateTime FromSysDate { get; set; }
-    [NotMapped]
+
     public DateTime ToSysDate { get; set; }
 }

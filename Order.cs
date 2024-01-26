@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 public class Order : ITemporalEntity
 {
@@ -9,8 +8,7 @@ public class Order : ITemporalEntity
     public Product Product { get; set; }
     public Customer Customer { get; set; }
 
-    [NotMapped]
     public DateTime FromSysDate { get; set; }
-    [NotMapped]
+
     public DateTime ToSysDate {  get; set; }
 }
