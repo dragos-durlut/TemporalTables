@@ -35,12 +35,12 @@ public static class SqlServerDbSetExtensions
     {
 #pragma warning disable EF1001 // Internal EF Core API usage.
         var queryableSource = (IQueryable)source;
-        var queryRootExpression = (QueryRootExpression)queryableSource.Expression;
-        var entityType = queryRootExpression.EntityType;
+        var entityQueryRootExpression = (EntityQueryRootExpression)queryableSource.Expression;
+        var entityType = entityQueryRootExpression.EntityType;
 
         var query = queryableSource.Provider.CreateQuery<TEntity>(
             new TemporalAsOfQueryRootExpression(
-                queryRootExpression.QueryProvider!,
+                entityQueryRootExpression.QueryProvider!,
                 entityType,
                 utcPointInTime)).AsTracking(queryTrackingBehavior);
         return query;
