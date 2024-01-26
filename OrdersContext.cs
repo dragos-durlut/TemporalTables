@@ -34,7 +34,7 @@ public class OrdersContext : DbContext
                 .LogTo(Console.WriteLine, new[] { RelationalEventId.CommandExecuted });
         }
 
-        optionsBuilder.ReplaceService<IEntityMaterializerSource, TemporalEntityMaterializerSource>();
+        
     }
 
     private void SetupTemporalTableBuilder<TEntity>(TemporalTableBuilder<TEntity> temporalTableBuilder) where TEntity: class , ITemporalEntity
