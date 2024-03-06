@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using TemporalTables;
 
@@ -34,7 +35,8 @@ public class OrdersContext : DbContext
                 .LogTo(Console.WriteLine, new[] { RelationalEventId.CommandExecuted });
         }
 
-        optionsBuilder.AddInterceptors(TemporalEntityMaterializationInterceptor.Instance);
+        optionsBuilder.ReplaceService<IEntityMaterializerSource, TemporalEntityMaterializerSource>();
+        //optionsBuilder.AddInterceptors(TemporalEntityMaterializationInterceptor.Instance);
     }
 
     private void SetupTemporalTableBuilder<TEntity>(TemporalTableBuilder<TEntity> temporalTableBuilder) where TEntity: class , ITemporalEntity
