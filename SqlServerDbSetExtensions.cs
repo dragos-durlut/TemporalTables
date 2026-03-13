@@ -4,6 +4,14 @@ using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System;
 using System.Linq;
 
+/// <summary>
+/// Provides extension methods for applying temporal operations to DbSet instances when using SQL Server temporal tables
+/// with Entity Framework Core.
+/// </summary>
+/// <remarks>These extension methods enable querying historical data by specifying a point in time, allowing
+/// retrieval of entity states as they existed at that moment. </remarks>
+/// <see cref="https://github.com/dotnet/efcore/issues/27289"/>
+/// <seealso cref="https://github.com/dragos-durlut/TemporalTables/tree/temporal-tracking-behaviour"/>
 public static class SqlServerDbSetExtensions
 {
     /// <summary>
