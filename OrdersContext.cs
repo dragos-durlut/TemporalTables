@@ -35,7 +35,7 @@ public class OrdersContext : DbContext
                 .LogTo(Console.WriteLine, new[] { RelationalEventId.CommandExecuted });
         }
 
-        optionsBuilder.ReplaceService<IEntityMaterializerSource, TemporalEntityMaterializerSource>();
+        optionsBuilder.ReplaceService<IStructuralTypeMaterializerSource, TemporalStructuralTypeMaterializerSource>();
         //optionsBuilder.AddInterceptors(TemporalEntityMaterializationInterceptor.Instance);
     }
 
