@@ -10,9 +10,10 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query
 {
 #pragma warning disable EF1001 // Internal EF Core API usage.
     /// <summary>
-    /// Fixes AsOf and FromTo temporal query with join with non-temporal child entities
-    /// See https://github.com/dotnet/efcore/issues/27259
+    /// Fixes AsOf and FromTo temporal query with join with non-temporal child entities    
     /// </summary>
+    /// <see cref="https://github.com/dotnet/efcore/issues/27259"/>
+    /// <seealso cref="https://github.com.mcas.ms/dotnet/efcore/blob/v10.0.0/src/EFCore.SqlServer/Query/Internal/SqlServerNavigationExpansionExtensibilityHelper.cs"/>
     public class CustomSqlServerNavigationExpansionExtensibilityHelper : SqlServerNavigationExpansionExtensibilityHelper, INavigationExpansionExtensibilityHelper
     {
         public CustomSqlServerNavigationExpansionExtensibilityHelper(NavigationExpansionExtensibilityHelperDependencies dependencies) : base(dependencies)
